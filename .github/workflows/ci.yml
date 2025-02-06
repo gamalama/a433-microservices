@@ -1,30 +1,40 @@
-name: Go
+# Menentukan nama pipeline
+name: Karsajobs CI Pipeline
 
+# Menentukan event trigger. Pipeline akan berjalan pada event push
 on:
   push:
+    # Pipeline akan berjalan pada saat ada perubahan di branch karsajobs
     branches: 
       - karsajobs
 
+# Mendefinisikan pekerjaan yang dilakukan ketika event trigger dibangkitkan
 jobs:
-
-  build:
+  build_and_push:
+    # Pipeline akan berjalan di Github-hosted runner sistem operasi Ubuntu
     runs-on: ubuntu-latest
+    # Menentukan langkah-langkah untuk menjalankan job
     steps:
+    # Menentukan 'action' dari actions/checkout untuk mengakses repositori git
     - uses: actions/checkout@v4
 
+    # Menentukan 'action' dari actions/setup-go untuk environment test
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
         go-version: '1.21.1'
 
+    # Menentukan 'action' dari hadolint untuk mengecek sintaks Dockerfile
     - uses: hadolint/hadolint-action@v3.1.0
       name: lint-dockerfile
       with: 
         dockerfile: Dockerfile
     
+    # Menjalankan test
     - name: test-app
       run: go test -v -short --count=1 $(go list ./...)
 
+    # Menjalankan build image dan push ke Github Packages
     - name: build-app-karsajobs
       run: ./build_push_image_karsajobs.sh
       env:
