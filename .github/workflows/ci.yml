@@ -1,30 +1,42 @@
-name: Node.js CI
+# Menentukan nama pipeline
+name: Karsajobs UI Pipeline
 
+# Menentukan event trigger. Pipeline akan berjalan pada event push
 on:
   push:
+    # Pipeline akan berjalan pada saat ada perubahan di branch karsajobs-ui
     branches:
       - karsajobs-ui
 
+# Mendefinisikan pekerjaan yang dilakukan ketika event trigger dibangkitkan
 jobs:
   build:
-
+    # Pipeline akan berjalan di Github-hosted runner sistem operasi Ubuntu
     runs-on: ubuntu-latest
 
+    # Menentukan versi Node untuk menjalankan job
     strategy:
       matrix:
         node-version: [18.x, 20.x, 22.x]
 
+    # Menentukan langkah-langkah untuk menjalankan job
     steps:
+    
+    # Menentukan 'action' dari actions/checkout untuk mengakses repositori git
     - uses: actions/checkout@v4
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'npm'
+
+    # Menentukan 'action' dari hadolint untuk mengecek sintaks Dockerfile
     - uses: hadolint/hadolint-action@v3.1.0
       name: lint-dockerfile
       with: 
         dockerfile: Dockerfile
+
+    # Menjalankan build image dan push ke Github Packages
     - name: build-app-karsajobs-ui
       run: ./build_push_image_karsajobs_ui.sh
       env:
