@@ -27,3 +27,5 @@ jobs:
 
     - name: build-app-karsajobs
       run: ./build_push_image_karsajobs.sh
+      env:
+        CR_PAT: ${{ secrets.CR_PAT }}
